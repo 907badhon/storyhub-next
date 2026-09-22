@@ -6,7 +6,7 @@ import { useState, useEffect, FormEvent, useRef } from "react";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
-import { uploadImage } from "@/lib/supabase/storage";
+import { uploadImage } from "@/lib/cloudinary/storage";
 import toast from "react-hot-toast";
 
 export default function EditProfilePage() {
@@ -27,9 +27,6 @@ export default function EditProfilePage() {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // ================================
-  // Profile load
-  // ================================
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -45,9 +42,6 @@ export default function EditProfilePage() {
     }
   }, [profile]);
 
-  // ================================
-  // Handle change
-  // ================================
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -57,9 +51,6 @@ export default function EditProfilePage() {
     });
   };
 
-  // ================================
-  // Photo upload
-  // ================================
   const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
@@ -91,9 +82,6 @@ export default function EditProfilePage() {
     }
   };
 
-  // ================================
-  // Save all changes
-  // ================================
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -148,9 +136,6 @@ export default function EditProfilePage() {
     }
   };
 
-  // ================================
-  // Loading
-  // ================================
   if (loading) {
     return (
       <div className="animate-pulse">

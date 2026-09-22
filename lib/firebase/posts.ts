@@ -1,0 +1,83 @@
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+  serverTimestamp,
+  increment,
+} from "firebase/firestore";
+import { db } from "./config";
+import { Post } from "@/types/post";
+
+export async function createPost(
+  data: Omit<Post, "id" | "createdAt" | "updatedAt">,
+): Promise<string> {
+  const docRef = await addDoc(collection(db, "posts"), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return docRef.id;
+}
+
+export async function updatePost(
+  postId: string,
+  data: Partial<Post>,
+): Promise<void> {
+  await updateDoc(doc(db, "posts", postId), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deletePost(postId: string): Promise<void> {
+  await deleteDoc(doc(db, "posts", postId));
+}
+
+export async function getPostById(postId: string): Promise<Post | null> {
+  const snap = await getDoc(doc(db, "posts", postId));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() } as Post;
+}
+
+export async function getPostBySlug(slug: string): Promise<Post | null> {
+  const q = query(collection(db, "posts"), where("slug", "==", slug), limit(1));
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  return { id: d.id, ...d.data() } as Post;
+}
+
+export async function getPublishedPosts(count = 10): Promise<Post[]> {
+  const q = query(
+    collection(db, "posts"),
+    where("status", "==", "published"),
+    orderBy("publishedAt", "desc"),
+    limit(count),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Post[];
+}
+
+export async function getUserPosts(userId: string): Promise<Post[]> {
+  const q = query(
+    collection(db, "posts"),
+    where("authorId", "==", userId),
+    orderBy("createdAt", "desc"),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Post[];
+}
+
+export async function incrementViewCount(postId: string): Promise<void> {
+  await updateDoc(doc(db, "posts", postId), {
+    viewCount: increment(1),
+  });
+}

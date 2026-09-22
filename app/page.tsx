@@ -1,76 +1,74 @@
-// app/test/page.tsx
+import type { Metadata } from "next";
+import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/seo/config";
 
-"use client";
+export const metadata: Metadata = {
+  title: "Home",
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: `${SITE_NAME} — Stories that matter`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: ["/og-image.png"],
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
+};
 
-import { useAuth } from "@/contexts/AuthContext";
-import toast from "react-hot-toast";
-
-export default function TestPage() {
-  const { user, profile, loading } = useAuth();
-
-  const showSuccess = () => {
-    toast.success("এটা একটা success message!");
-  };
-
-  const showError = () => {
-    toast.error("এটা একটা error message!");
-  };
-
-  const showLoading = () => {
-    const loadingToast = toast.loading("Loading...");
-    setTimeout(() => {
-      toast.success("Loaded!", { id: loadingToast });
-    }, 2000);
-  };
-
+export default function HomePage() {
   return (
-    <main className="min-h-screen p-8 bg-gray-50">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">🔐 Auth Test</h1>
-
-        <div className="bg-white rounded-lg shadow p-6 space-y-4 mb-6">
-          <div className="flex justify-between items-center border-b pb-3">
-            <span className="font-medium">Loading:</span>
-            <span className="text-lg">{loading ? "⏳ Yes" : "✅ No"}</span>
-          </div>
-
-          <div className="flex justify-between items-center border-b pb-3">
-            <span className="font-medium">User:</span>
-            <span className="text-lg">
-              {user ? `✅ ${user.email}` : "❌ Not logged in"}
-            </span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <span className="font-medium">Profile:</span>
-            <span className="text-lg">{profile ? "✅ Loaded" : "❌ None"}</span>
-          </div>
+    <main className="min-h-screen bg-gray-50">
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+            Welcome to {SITE_NAME}
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl">
+            Stories, tutorials, and insights about tech, programming, and career
+            growth.
+          </p>
         </div>
+      </section>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-bold mb-4">🔔 Toast Test</h2>
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={showSuccess}
-              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-            >
-              Success Toast
-            </button>
-            <button
-              onClick={showError}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-            >
-              Error Toast
-            </button>
-            <button
-              onClick={showLoading}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-            >
-              Loading → Success
-            </button>
-          </div>
+      <section className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Latest Posts</h2>
+        <div className="bg-white rounded-xl border border-dashed border-gray-300 p-12 text-center">
+          <p className="text-gray-500">
+            Posts শীঘ্রই আসছে। Phase 4 এ এখানে posts দেখা যাবে।
+          </p>
         </div>
-      </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Trending</h2>
+        <div className="bg-white rounded-xl border border-dashed border-gray-300 p-12 text-center">
+          <p className="text-gray-500">Trending posts শীঘ্রই আসছে।</p>
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          Browse Categories
+        </h2>
+        <div className="bg-white rounded-xl border border-dashed border-gray-300 p-12 text-center">
+          <p className="text-gray-500">Categories শীঘ্রই আসছে।</p>
+        </div>
+      </section>
     </main>
   );
 }

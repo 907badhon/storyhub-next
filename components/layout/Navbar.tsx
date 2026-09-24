@@ -18,6 +18,7 @@ import {
   FiSettings,
   FiBookmark,
   FiChevronDown,
+  FiShield,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 
@@ -136,6 +137,16 @@ export default function Navbar() {
                     Dashboard
                   </Link>
 
+                  {profile?.role === "admin" && (
+                    <Link
+                      href="/admin"
+                      className="hidden items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 sm:flex"
+                    >
+                      <FiShield className="h-4 w-4" />
+                      Admin
+                    </Link>
+                  )}
+
                   <Link
                     href="/dashboard"
                     aria-label="Open dashboard"
@@ -205,6 +216,16 @@ export default function Navbar() {
                             <FiGrid className="w-4 h-4" />
                             Dashboard
                           </Link>
+                          {profile?.role === "admin" && (
+                            <Link
+                              href="/admin"
+                              onClick={() => setMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-2.5 text-sm text-rose-600 transition hover:bg-rose-50"
+                            >
+                              <FiShield className="h-4 w-4" />
+                              Admin Dashboard
+                            </Link>
+                          )}
                           <Link
                             href="/dashboard/posts/new"
                             onClick={() => setMenuOpen(false)}

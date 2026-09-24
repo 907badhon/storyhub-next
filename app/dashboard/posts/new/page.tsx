@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 import { createPost } from "@/lib/firebase/posts";
 import { generateSlug } from "@/lib/utils/slug";
+import RichTextEditor from "@/components/blog/RichTextEditor";
 
 export default function NewPostPage() {
   const { user, profile, loading } = useProtectedRoute();
@@ -128,7 +129,7 @@ export default function NewPostPage() {
       toast.success(status === "draft" ? "Draft saved!" : "Post published!", {
         id: toastId,
       });
-      router.push("/dashboard/posts");
+      router.push("/dashboard?tab=posts");
     } catch (err: any) {
       console.error("Error saving post:", err);
       toast.error("Failed to save post", { id: toastId });
@@ -150,7 +151,9 @@ export default function NewPostPage() {
     <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Create Post</h1>
-        <p className="text-gray-600 mt-2">নতুন story লেখো</p>
+        <p className="text-gray-600 mt-2">
+          Write a new post and share your knowledge with the world
+        </p>
       </div>
 
       <form className="space-y-6">
@@ -244,21 +247,18 @@ export default function NewPostPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Content
-            </label>
-            <textarea
-              name="content"
-              value={form.content}
-              onChange={handleChange}
-              rows={10}
-              placeholder="Write your post content here..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none font-mono text-sm"
-              disabled={saving}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Rich text editor পরের step এ আসবে
-            </p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Content *
+              </label>
+              <RichTextEditor
+                content={form.content}
+                onChange={(html) =>
+                  setForm((prev) => ({ ...prev, content: html }))
+                }
+                placeholder="Start writing your story..."
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -292,38 +292,6 @@ export default function NewPostPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 space-y-4">
-          <h2 className="text-lg font-semibold">SEO</h2>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              SEO Title
-            </label>
-            <input
-              name="seoTitle"
-              value={form.seoTitle}
-              onChange={handleChange}
-              placeholder="Leave blank to use post title"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              disabled={saving}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              SEO Description
-            </label>
-            <textarea
-              name="seoDescription"
-              value={form.seoDescription}
-              onChange={handleChange}
-              rows={2}
-              placeholder="Leave blank to use excerpt"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-              disabled={saving}
-            />
-          </div>
-        </div>
 
         <div className="flex gap-3 justify-end">
           <button

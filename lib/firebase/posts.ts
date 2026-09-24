@@ -77,7 +77,49 @@ export async function getUserPosts(userId: string): Promise<Post[]> {
 }
 
 export async function incrementViewCount(postId: string): Promise<void> {
-  await updateDoc(doc(db, "posts", postId), {
-    viewCount: increment(1),
-  });
+  try {
+    // Firestore এর post এ count বাড়াও (author হলে কাজ করবে)
+    await updateDoc(doc(db, "posts", postId), {
+      viewCount: increment(1),
+    });
+  } catch (err: any) {
+    // Permission deny হলে ignore করো (view count critical না)
+    if (err.code === "permission-denied") {
+      console.log("View count skipped (no permission)");
+      return;
+    }
+    throw err;
+  }
+}
+
+export async function getPostsByCategory(category: string): Promise<Post[]> {
+  const q = query(
+    collection(db, "posts"),
+    where("category", "==", category),
+    where("status", "==", "published"),
+    orderBy("publishedAt", "desc"),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Post[];
+}
+
+export async function getPostsByTag(tag: string): Promise<Post[]> {
+  const q = query(
+    collection(db, "posts"),
+    where("tags", "array-contains", tag),
+    where("status", "==", "published"),
+    orderBy("publishedAt", "desc"),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Post[];
+}
+export async function getTrendingPosts(count = 5): Promise<Post[]> {
+  const q = query(
+    collection(db, "posts"),
+    where("status", "==", "published"),
+    orderBy("viewCount", "desc"),
+    limit(count),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Post[];
 }

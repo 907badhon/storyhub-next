@@ -2,21 +2,16 @@
 
 "use client";
 
-import type { Metadata } from "next";
-
-import { useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { loginUser, loginWithGoogle } from "@/lib/firebase/auth";
-
-export const metadata: Metadata = {
-  title: "Login to StoryHub",
-  description: "Login to your StoryHub account",
-};
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -26,6 +21,14 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!authLoading && user) router.replace("/dashboard");
+  }, [authLoading, router, user]);
+
+  if (authLoading || user) {
+    return <main className="min-h-screen bg-gray-50" />;
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({

@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
 import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/seo/config";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -44,7 +45,8 @@ export default function RootLayout({
         <AuthProvider>
           <Navbar />
           {children}
-          <Toaster position="top-right" />
+          <Footer />
+          <Toaster position="top-right" toastOptions={{ style: { borderRadius: '12px', fontSize: '14px' } }} />
         </AuthProvider>
       </body>
     </html>

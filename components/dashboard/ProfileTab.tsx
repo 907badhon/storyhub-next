@@ -77,7 +77,7 @@ export default function EditProfilePage() {
       toast.error("Failed to upload photo", { id: toastId });
     } finally {
       setUploading(false);
-      // Reset input যাতে same file আবার select করা যায়
+      // Reset the input so the same file can be selected again.
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
@@ -151,7 +151,7 @@ export default function EditProfilePage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Edit Profile</h1>
         <p className="text-gray-600 mt-2">
-          তোমার public profile তথ্য update করো
+          Update your public profile information
         </p>
       </div>
 
@@ -241,7 +241,7 @@ export default function EditProfilePage() {
                 />
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                তোমার profile URL: /author/{formData.username || "username"}
+                Your profile URL: /author/{formData.username || "username"}
               </p>
             </div>
 
@@ -254,7 +254,7 @@ export default function EditProfilePage() {
                 value={formData.bio}
                 onChange={handleChange}
                 rows={4}
-                placeholder="নিজের সম্পর্কে কিছু লেখো..."
+                placeholder="Tell readers about yourself..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
                 disabled={saving}
               />

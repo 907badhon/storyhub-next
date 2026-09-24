@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/config";
+import { Post } from "@/types/post";
 import ProfileContent from "./ProfileContent";
 
 async function getAuthorByUsername(username: string) {
@@ -16,6 +17,28 @@ async function getAuthorByUsername(username: string) {
   } catch (err) {
     console.error("Error fetching author:", err);
     return null;
+  }
+}
+
+async function getAuthorPosts(authorId: string): Promise<Post[]> {
+  try {
+    const postsQuery = query(
+      collection(db, "posts"),
+      where("authorId", "==", authorId),
+      where("status", "==", "published"),
+    );
+    const snapshot = await getDocs(postsQuery);
+
+    return snapshot.docs
+      .map((postDoc) => ({ id: postDoc.id, ...postDoc.data() }) as Post)
+      .sort((a, b) => {
+        const aTime = a.publishedAt?.seconds || 0;
+        const bTime = b.publishedAt?.seconds || 0;
+        return bTime - aTime;
+      });
+  } catch (err) {
+    console.error("Error fetching author posts:", err);
+    return [];
   }
 }
 
@@ -74,6 +97,8 @@ export default async function AuthorProfilePage({
 
   if (!author) notFound();
 
+  const posts = await getAuthorPosts(author.uid);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -93,7 +118,10 @@ export default async function AuthorProfilePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ProfileContent author={JSON.parse(JSON.stringify(author))} />
+      <ProfileContent
+        author={JSON.parse(JSON.stringify(author))}
+        posts={JSON.parse(JSON.stringify(posts))}
+      />
     </>
   );
 }

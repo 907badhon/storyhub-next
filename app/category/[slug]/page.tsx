@@ -5,16 +5,21 @@ import { db } from "@/lib/firebase/config";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/config";
 import PostCard from "@/components/blog/PostCard";
 import { Post } from "@/types/post";
+import { generateSlug } from "@/lib/utils/slug";
 
 async function getPosts(category: string): Promise<Post[]> {
   try {
     const q = query(
       collection(db, "posts"),
-      where("category", "==", category),
       where("status", "==", "published"),
     );
     const snap = await getDocs(q);
-    const posts = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Post[];
+    const posts = (snap.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    })) as Post[]).filter(
+      (post) => generateSlug(String(post.category || "")) === category,
+    );
     return posts.sort((a: any, b: any) => {
       const aTime = a.publishedAt?.seconds || 0;
       const bTime = b.publishedAt?.seconds || 0;

@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { logoutUser } from "@/lib/firebase/auth";
 import NotificationBell from "./NotificationBell";
 import SearchModal from "../search/SearchModal";
+import CategorySidebar from "../category/CategorySidebar";
 import {
   FiSearch,
   FiEdit3,
@@ -28,6 +29,7 @@ export default function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -96,6 +98,13 @@ export default function Navbar() {
                 <span>Search...</span>
                 <kbd className="hidden md:inline-block text-xs bg-gray-100 border border-gray-200 rounded px-1.5 py-0.5 text-gray-400 font-mono">⌘K</kbd>
               </button>
+              <button
+                type="button"
+                onClick={() => setCategoriesOpen(true)}
+                className="hidden items-center rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-600 sm:flex"
+              >
+                Categories
+              </button>
             </div>
 
             {/* Right side */}
@@ -107,6 +116,14 @@ export default function Navbar() {
                 aria-label="Search"
               >
                 <FiSearch className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setCategoriesOpen(true)}
+                aria-label="Open categories"
+                className="rounded-xl px-2 py-2 text-xs font-semibold text-indigo-600 transition hover:bg-indigo-50 sm:hidden"
+              >
+                Categories
               </button>
 
               {/* Loading state */}
@@ -272,6 +289,7 @@ export default function Navbar() {
       </nav>
 
       <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      <CategorySidebar isOpen={categoriesOpen} onClose={() => setCategoriesOpen(false)} />
     </>
   );
 }

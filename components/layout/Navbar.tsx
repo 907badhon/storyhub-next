@@ -101,7 +101,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setCategoriesOpen(true)}
-                className="hidden items-center rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-600 sm:flex"
+                className="flex items-center rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-600"
               >
                 Categories
               </button>
@@ -117,15 +117,6 @@ export default function Navbar() {
               >
                 <FiSearch className="w-5 h-5" />
               </button>
-              <button
-                type="button"
-                onClick={() => setCategoriesOpen(true)}
-                aria-label="Open categories"
-                className="rounded-xl px-2 py-2 text-xs font-semibold text-indigo-600 transition hover:bg-indigo-50 sm:hidden"
-              >
-                Categories
-              </button>
-
               {/* Loading state */}
               {loading && (
                 <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse" />

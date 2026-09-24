@@ -6,6 +6,8 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  getRedirectResult,
+  signInWithRedirect,
   sendPasswordResetEmail,
   sendEmailVerification,
   User,
@@ -55,11 +57,32 @@ export async function loginUser(email: string, password: string) {
   return userCredential.user;
 }
 
-export async function loginWithGoogle() {
+export async function loginWithGoogle(): Promise<"popup" | "redirect"> {
   const provider = new GoogleAuthProvider();
-  const userCredential = await signInWithPopup(auth, provider);
-  const user = userCredential.user;
+  provider.setCustomParameters({ prompt: "select_account" });
 
+  try {
+    const userCredential = await signInWithPopup(auth, provider);
+    await ensureUserProfile(userCredential.user);
+    return "popup";
+  } catch (error: any) {
+    if (error.code === "auth/popup-blocked") {
+      await signInWithRedirect(auth, provider);
+      return "redirect";
+    }
+    throw error;
+  }
+}
+
+export async function completeGoogleRedirect() {
+  const result = await getRedirectResult(auth);
+  if (!result) return null;
+
+  await ensureUserProfile(result.user);
+  return result.user;
+}
+
+async function ensureUserProfile(user: User) {
   const userDocRef = doc(db, "users", user.uid);
   const userDocSnap = await getDoc(userDocRef);
 

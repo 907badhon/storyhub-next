@@ -6,7 +6,11 @@ import { useEffect, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { loginUser, loginWithGoogle } from "@/lib/firebase/auth";
+import {
+  completeGoogleRedirect,
+  loginUser,
+  loginWithGoogle,
+} from "@/lib/firebase/auth";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
@@ -21,6 +25,30 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function finishGoogleRedirect() {
+      try {
+        const redirectedUser = await completeGoogleRedirect();
+        if (redirectedUser && !cancelled) {
+          toast.success("Welcome back!");
+          router.replace("/");
+        }
+      } catch (err: any) {
+        if (!cancelled) {
+          setError(getGoogleLoginError(err));
+          toast.error(getGoogleLoginError(err));
+        }
+      }
+    }
+
+    finishGoogleRedirect();
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   useEffect(() => {
     if (!authLoading && user) router.replace("/dashboard");
@@ -90,21 +118,14 @@ export default function LoginPage() {
     const toastId = toast.loading("Signing in with Google...");
 
     try {
-      await loginWithGoogle();
+      const result = await loginWithGoogle();
+      if (result === "redirect") return;
       toast.success("Welcome back!", { id: toastId });
       router.push("/");
     } catch (err: any) {
       console.error("Google login error:", err);
 
-      let errorMessage = "Google login failed.";
-
-      if (err.code === "auth/popup-closed-by-user") {
-        errorMessage = "Login cancelled.";
-      } else if (err.code === "auth/popup-blocked") {
-        errorMessage = "Popup blocked. Allow popups for this site.";
-      } else if (err.code === "auth/cancelled-popup-request") {
-        errorMessage = "";
-      }
+      const errorMessage = getGoogleLoginError(err);
 
       if (errorMessage) {
         setError(errorMessage);
@@ -249,4 +270,14 @@ export default function LoginPage() {
       </div>
     </main>
   );
+}
+
+function getGoogleLoginError(error: { code?: string }) {
+  if (error.code === "auth/popup-closed-by-user") return "Login cancelled.";
+  if (error.code === "auth/popup-blocked") return "Popup blocked. Redirecting to Google...";
+  if (error.code === "auth/cancelled-popup-request") return "";
+  if (error.code === "auth/unauthorized-domain") {
+    return "Google login is not enabled for this domain yet.";
+  }
+  return "Google login failed. Please try again.";
 }

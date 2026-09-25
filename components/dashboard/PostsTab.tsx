@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
-import { getUserPosts, deletePost } from "@/lib/firebase/posts";
+import { getPostActionError, getUserPosts, deletePost } from "@/lib/firebase/posts";
 import { Post } from "@/types/post";
 import { FiEdit3, FiEye, FiFileText, FiHeart, FiPlus, FiTrash2 } from "react-icons/fi";
 
@@ -31,7 +31,8 @@ export default function MyPostsPage() {
 
   useEffect(() => {
     if (user) fetchPosts();
-  }, [user]);
+    else if (!loading) setLoadingPosts(false);
+  }, [user, loading]);
 
   const visiblePosts = statusFilter
     ? posts.filter((post) => post.status === statusFilter)
@@ -43,10 +44,10 @@ export default function MyPostsPage() {
     const toastId = toast.loading("Deleting...");
     try {
       await deletePost(postId);
-      setPosts(posts.filter((p) => p.id !== postId));
+      setPosts((current) => current.filter((p) => p.id !== postId));
       toast.success("Post deleted", { id: toastId });
     } catch (err) {
-      toast.error("Failed to delete", { id: toastId });
+      toast.error(getPostActionError(err, "delete"), { id: toastId });
     }
   };
 

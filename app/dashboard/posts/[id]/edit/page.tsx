@@ -4,7 +4,12 @@ import { useState, useEffect, FormEvent, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
-import { getPostById, updatePost, deletePost } from "@/lib/firebase/posts";
+import {
+  getPostActionError,
+  getPostById,
+  updatePost,
+  deletePost,
+} from "@/lib/firebase/posts";
 import { uploadImage } from "@/lib/cloudinary/storage";
 import { generateSlug } from "@/lib/utils/slug";
 import RichTextEditor from "@/components/blog/RichTextEditor";
@@ -73,8 +78,9 @@ export default function EditPostPage({
         setLoadingPost(false);
       }
     }
-    load();
-  }, [user, postId, router]);
+    if (user && postId) load();
+    else if (!loading) setLoadingPost(false);
+  }, [user, postId, router, loading]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -167,7 +173,7 @@ export default function EditPostPage({
       router.push("/dashboard?tab=posts");
     } catch (err: any) {
       console.error("Update error:", err);
-      toast.error("Failed to update post", { id: toastId });
+      toast.error(getPostActionError(err, "update"), { id: toastId });
     } finally {
       setSaving(false);
     }
@@ -183,7 +189,7 @@ export default function EditPostPage({
       toast.success("Post deleted", { id: toastId });
       router.push("/dashboard?tab=posts");
     } catch (err) {
-      toast.error("Failed to delete", { id: toastId });
+      toast.error(getPostActionError(err, "delete"), { id: toastId });
     }
   };
 

@@ -41,6 +41,20 @@ export async function deletePost(postId: string): Promise<void> {
   await deleteDoc(doc(db, "posts", postId));
 }
 
+export function getPostActionError(error: unknown, action: "update" | "delete") {
+  const code = typeof error === "object" && error && "code" in error
+    ? String(error.code)
+    : "";
+
+  if (code === "permission-denied") {
+    return `You do not have permission to ${action} this post. Check your Firestore rules and post ownership.`;
+  }
+  if (code === "unauthenticated") {
+    return "Your session has expired. Please log in again.";
+  }
+  return `Failed to ${action} post. Please try again.`;
+}
+
 export async function getPostById(postId: string): Promise<Post | null> {
   const snap = await getDoc(doc(db, "posts", postId));
   if (!snap.exists()) return null;
